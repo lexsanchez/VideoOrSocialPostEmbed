@@ -16,7 +16,7 @@
  *
  */
 
-class VideoOrSocialPostEmbed extends Textformatter implements ConfigurableModule {
+class TextformatterVideoOrSocialPostEmbed extends Textformatter implements ConfigurableModule {
 
 	public static function getModuleInfo() {
 		return array(
