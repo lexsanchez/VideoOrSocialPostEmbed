@@ -24,7 +24,7 @@ class VideoOrSocialPostEmbed extends Textformatter implements ConfigurableModule
 			'version' => 121, 
 			'summary' => __('Enter a full YouTube, Vimeo, Instagram, Facebook, Twitter or Issuu URL by itself in any paragraph (example: http://www.youtube.com/watch?v=Wl4XiYadV_k) and this will automatically convert it to an embedded video or social post. This formatter is intended to be run on trusted input. Recommended for use with TinyMCE textarea fields.', __FILE__),
 			'author' => 'Ryan Cramer / Lex Sanchez',
-			'href' => 'http://modules.processwire.com/modules/textformatter-video-embed/'
+			'href' => 'https://modules.processwire.com/modules/video-or-social-post-embed/'
 			); 
 	}
 

@@ -16,7 +16,7 @@ ProcessWire Textformatter module that enables translation of YouTube, Vimeo, Ins
 
 - Edit your *body* field in Setup > Fields (or whatever field(s) you will be placing videos in). On the *details* tab, find the *Text Formatters* field and select "Video or Social Post Embed". Save. 
 
-- Edit a page using the field you edited and paste in YouTube and/or Vimeo video URLs each on their own paragraph. 
+- Edit a page using the field you edited and paste in YouTube, Vimeo, Facebook, Twitter, Instagram and/or Issuu URLs each on their own paragraph. 
 
 ### Example 
 
@@ -45,9 +45,7 @@ How it might look in your editor (like TinyMCE):
 
 ## How it works
 
-This module uses YouTube and Vimeo oEmbed services to generate the embed codes populated in your content. After these services are queried the first time, the embed code is cached so that it doesn't need to be pulled again. 
-
-The advantage of using the oEmbed services is that you get a video formatted at the proper width, height and proportion. You can also set a max width and max height (in the module config) and expect a proportional video. 
+This module uses YouTube, Vimeo, Instagram, Facebook, Twitter and Issuu oEmbed services to generate the embed codes populated in your content. After these services are queried the first time, the embed code is cached so that it doesn't need to be pulled again. 
 
 ## Configuration
 
@@ -58,7 +56,7 @@ If you change these max width / max height settings you may also want to check t
 ### Using with Markdown, Textile or other LML
 
 This text formatter is looking for a YouTube, Vimeo, Instagram, Facebook, Twitter or Issuu video URL surrounded by paragraph tags. As a result, if you are using Markdown or Textile (or something else like it) you want that text formatter to run before this one. 
-That ensures that the expected paragraph tags will be present when VideoOrSocialPostEmbed runs.  You can control the order that text formatters are run in by drag/drop sorting in the field editor.
+That ensures that the expected paragraph tags will be present when VideoOrSocialPostEmbed runs. You can control the order that text formatters are run in by drag/drop sorting in the field editor.
 
 ------
 Copyright 2018 by Ryan Cramer / Updated by Lex Sanchez
