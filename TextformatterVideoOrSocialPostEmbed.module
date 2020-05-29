@@ -8,7 +8,7 @@
  * Copyright (C) 2016 by Ryan Cramer / Updated by Lex Sanchez
  * Licensed under MPL 2.0
  * https://processwire.com
- * http://dnespanama.com
+ * https://dnespanama.com
  *
  * @property int $maxWidth
  * @property int $maxHeight
@@ -21,8 +21,8 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 	public static function getModuleInfo() {
 		return array(
 			'title' => __('Video or Social Post Embed', __FILE__), 
-			'version' => 123, 
-			'summary' => __('Enter a full YouTube, Vimeo, Instagram, Facebook, Twitter or Issuu URL by itself in any paragraph (example: http://www.youtube.com/watch?v=Wl4XiYadV_k) and this will automatically convert it to an embedded video or social post. This formatter is intended to be run on trusted input. Recommended for use with TinyMCE textarea fields.', __FILE__),
+			'version' => 125, 
+			'summary' => __('Enter a full YouTube, Vimeo, Instagram, Facebook, Twitter or Issuu URL by itself in any paragraph (example: https://www.youtube.com/watch?v=Wl4XiYadV_k) and this will automatically convert it to an embedded video or social post. This formatter is intended to be run on trusted input. Recommended for use with TinyMCE textarea fields.', __FILE__),
 			'author' => 'Ryan Cramer / Lex Sanchez',
 			'href' => 'https://modules.processwire.com/modules/video-or-social-post-embed/'
 			); 
@@ -115,7 +115,7 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 		}
 
 		// account for possibility that stored embed code contains http version while requested on https
-		if($this->http == 'https') $embedCode = str_replace('http://', 'https://', $embedCode); 
+		if($this->http == 'https') $embedCode = str_replace('https://', 'https://', $embedCode); 
 
 		return $embedCode; 
 	}
@@ -130,6 +130,18 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 	protected function makeResponsive($out) {
 		$out = str_ireplace('<iframe ', "<iframe style='position:absolute;top:0;left:0;width:100%;height:100%;' ", $out);
 		$out = "<div class='TextformatterVideoEmbed' style='position:relative;padding:30px 0 56.25% 0;height:0;overflow:hidden;'>$out</div>";
+		return $out;
+	}
+
+	/**
+	 * Make an iframe-based embed code center content
+	 * 
+	 * @param string $out
+	 * @return string
+	 *
+	 */
+	protected function makeCenterEmbed($out) {
+		$out = "<div class='embed-container' style='width: 100%; text-align: center; margin: 10px;'>$out</div>";
 		return $out;
 	}
 
@@ -172,7 +184,7 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 		foreach($matches[0] as $key => $line) { 
 
 			$oembedURL = 
-				"$this->http://www.youtube.com/oembed?url=" . urlencode($matches[1][$key]) . 
+				"$this->https://www.youtube.com/oembed?url=" . urlencode($matches[1][$key]) . 
 				"&format=json&maxwidth={$this->maxWidth}&maxheight={$this->maxHeight}"; 
 
 			$videoID = $matches[2][$key]; 
@@ -186,6 +198,8 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 					$embedCode = str_replace("?", "?$queryString&", $embedCode);
 				}
 				if($this->responsive) $embedCode = $this->makeResponsive($embedCode);
+				else $embedCode = $this->makeCenterEmbed($embedCode);
+
 				$str = str_replace($line, $embedCode, $str); 
 			}
 		}
@@ -207,12 +221,13 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 		foreach($matches[0] as $key => $line) { 
 
 			$oembedURL = 
-				"$this->http://vimeo.com/api/oembed.json?url=" . urlencode($matches[1][$key]) . 
+				"$this->https://vimeo.com/api/oembed.json?url=" . urlencode($matches[1][$key]) . 
 				"&maxwidth={$this->maxWidth}&maxheight={$this->maxHeight}"; 
 
 			$videoID = $matches[2][$key]; 
 			$embedCode = $this->getEmbedCode($oembedURL, $videoID); 
 			if($this->responsive) $embedCode = $this->makeResponsive($embedCode);
+			else $embedCode = $this->makeCenterEmbed($embedCode);
 
 			if($embedCode) $str = str_replace($line, $embedCode, $str); 
 		}
@@ -238,7 +253,7 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 
 			$videoID = $matches[3][$key]; 
 			$embedCode = $this->getEmbedCode($oembedURL, $videoID); 
-			if($this->responsive) $embedCode = $this->makeResponsive($embedCode);
+			$embedCode = $this->makeCenterEmbed($embedCode);
 
 			if($embedCode) $str = str_replace($line, $embedCode, $str); 
 		}
@@ -264,7 +279,7 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 
 			$videoID = 'tw-'.$matches[3][$key]; 
 			$embedCode = $this->getEmbedCode($oembedURL, $videoID); 
-			if($this->responsive) $embedCode = $this->makeResponsive($embedCode);
+			$embedCode = $this->makeCenterEmbed($embedCode);
 
 			if($embedCode) $str = str_replace($line, $embedCode, $str); 
 		}
@@ -294,8 +309,7 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 
 			$videoID = 'fb-'.$this->wire('sanitizer')->name($matches[6][$key]); 
 			$embedCode = $this->getEmbedCode($oembedURL, $videoID); 
-
-			//if($this->responsive) $embedCode = $this->makeResponsive($embedCode);
+			$embedCode = $this->makeCenterEmbed($embedCode);
 
 			if($embedCode) $str = str_replace($line, $embedCode, $str); 
 		}
@@ -312,10 +326,6 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 
 		/****
 		 * Instagram URLs
-		 * URL scheme: http://instagram.com/p/*
-			URL scheme: http://instagr.am/p/*
-			URL scheme: http://www.instagram.com/p/*
-			URL scheme: http://www.instagr.am/p/*
 			URL scheme: https://instagram.com/p/*
 			URL scheme: https://instagr.am/p/*
 			URL scheme: https://www.instagram.com/p/*
@@ -335,7 +345,7 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 
 			$videoID = 'ig-'.$matches[4][$key]; 
 			$embedCode = $this->getEmbedCode($oembedURL, $videoID); 
-			if($this->responsive) $embedCode = $this->makeResponsive($embedCode);
+			$embedCode = $this->makeCenterEmbed($embedCode);
 
 			if($embedCode) $str = str_replace($line, $embedCode, $str); 
 		}
@@ -374,7 +384,7 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 		$f->attr('value', 1); 
 		if($data['responsive']) $f->attr('checked', 'checked'); 
 		$f->label = __('Use Responsive Embed Method?'); 
-		$f->description = __('When checked, videos will be embedded in a manner that allows them to be presented in a width-flexible format.'); 
+		$f->description = __('When checked, videos (Vimeo and Youtube) will be embedded in a manner that allows them to be presented in a width-flexible format.'); 
 		$inputfields->add($f); 
 
 		if($this->wire('input')->post('clearCache')) {
@@ -406,7 +416,7 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 		$sql =	"CREATE TABLE " . self::dbTableName . " (" . 
 			"video_id VARCHAR(128) NOT NULL PRIMARY KEY, " . 
 			"embed_code TEXT NOT NULL DEFAULT '', " . 
-			"created TIMESTAMP NOT NULL " . 
+			"created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP " . 
 			")";
 
 		$this->wire('database')->exec($sql);

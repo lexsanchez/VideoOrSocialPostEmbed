@@ -20,17 +20,17 @@ ProcessWire Textformatter module that enables translation of YouTube, Vimeo, Ins
 
 ### Example 
 
-How it might look in your editor (like TinyMCE): 
+How it might look in your editor (like CKEditor): 
 
 > Here are two videos about ProcessWire
 >
-> http://www.youtube.com/watch?v=Wl4XiYadV_k
+> https://www.youtube.com/watch?v=Wl4XiYadV_k
 > 
-> http://www.youtube.com/watch?v=XKnG7sikE-U 
+> https://www.youtube.com/watch?v=XKnG7sikE-U 
 > 
 > And here is a great video I watched earlier this week:
 > 
-> http://vimeo.com/18280328
+> https://vimeo.com/18280328
 > 
 > Embed social post and Issuu Presentation:
 > 
@@ -59,5 +59,5 @@ This text formatter is looking for a YouTube, Vimeo, Instagram, Facebook, Twitte
 That ensures that the expected paragraph tags will be present when VideoOrSocialPostEmbed runs. You can control the order that text formatters are run in by drag/drop sorting in the field editor.
 
 ------
-Copyright 2018 by Ryan Cramer / Updated by Lex Sanchez
+Copyright 2020 by Ryan Cramer / Updated by Lex Sanchez
 
