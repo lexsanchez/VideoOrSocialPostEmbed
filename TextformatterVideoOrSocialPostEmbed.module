@@ -100,7 +100,7 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 			if($data) $data = json_decode($data, true);
 
 			if(is_array($data) && isset($data['html'])) {
-				$embedCode = utf8encode($data['html']);
+				$embedCode = utf8_encode($data['html']);
 
 				$sql = 	"INSERT INTO $table SET " . 
 					"video_id=:videoID, " . 
