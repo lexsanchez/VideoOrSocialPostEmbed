@@ -87,14 +87,9 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 		$embedCode = '';
 
 		if($query->rowCount()) {
-			wire('log')->save('embedyoutube', 'paso 6 - '. $videoID);
-
 			list($embedCode) = $query->fetch(\PDO::FETCH_NUM); 
 			$query->closeCursor();
-
 		} else {
-
-			wire('log')->save('embedyoutube', 'paso 5 - '. $oembedURL);
 			$query->closeCursor();
 			$http = new WireHttp();
 			$http->setHeader('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
@@ -103,7 +98,7 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 
 			if(is_array($data) && isset($data['html'])) {
 				$embedCode = $data['html'];
-				//$embedCode = utf8_encode($data['html']);
+				$embedCode = utf8_encode($data['html']);
 
 				$sql = 	"INSERT INTO $table SET " . 
 					"video_id=:videoID, " . 
@@ -180,7 +175,6 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 			&& strpos($str, '://www.youtube.com/v/') === false 
 			&& strpos($str, '://youtu.be/') === false) return;
 
-		wire('log')->save('embedyoutube', 'paso 1');
 		// 1: full URL | 2:video id | 3: query string (optional)
 		$regex = '#<p>\s*(https?://(?:www\.)?youtu(?:.be|be.com)+/(?:watch/?\?v=|v/)?([^\s&<\'"]+))(&[-_,.=&;a-zA-Z0-9]*)?.*?</p>#';
 		if(!preg_match_all($regex, $str, $matches)) return;
@@ -191,11 +185,10 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 				"$this->http://www.youtube.com/oembed?url=" . urlencode($matches[1][$key]) . 
 				"&format=json&maxwidth={$this->maxWidth}&maxheight={$this->maxHeight}"; 
 
-			wire('log')->save('embedyoutube', 'paso 2 - '. $matches[2][$key]);
 			$videoID = $matches[2][$key]; 
 			$queryString = isset($matches[3][$key]) ? $matches[3][$key] : '';
 			$embedCode = $this->getEmbedCode($oembedURL, $videoID); 
-			wire('log')->save('embedyoutube', 'paso 3 - '. $embedCode);
+
 			if($embedCode) {
 				if(strlen($queryString)) {
 					$queryString = str_replace('&amp;', '&', $queryString);
