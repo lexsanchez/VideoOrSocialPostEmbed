@@ -21,7 +21,7 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 	public static function getModuleInfo() {
 		return array(
 			'title' => __('Video or Social Post Embed', __FILE__), 
-			'version' => 125, 
+			'version' => 126, 
 			'summary' => __('Enter a full YouTube, Vimeo, Instagram, Facebook, Twitter or Issuu URL by itself in any paragraph (example: https://www.youtube.com/watch?v=Wl4XiYadV_k) and this will automatically convert it to an embedded video or social post. This formatter is intended to be run on trusted input. Recommended for use with TinyMCE textarea fields.', __FILE__),
 			'author' => 'Ryan Cramer / Lex Sanchez',
 			'href' => 'https://modules.processwire.com/modules/video-or-social-post-embed/'
@@ -87,12 +87,14 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 		$embedCode = '';
 
 		if($query->rowCount()) {
+			wire('log')->save('embedyoutube', 'paso 6 - '. $videoID);
 
 			list($embedCode) = $query->fetch(\PDO::FETCH_NUM); 
 			$query->closeCursor();
 
 		} else {
 
+			wire('log')->save('embedyoutube', 'paso 5 - '. $oembedURL);
 			$query->closeCursor();
 			$http = new WireHttp();
 			$http->setHeader('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.13) Gecko/20080311 Firefox/2.0.0.13');
@@ -100,7 +102,8 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 			if($data) $data = json_decode($data, true);
 
 			if(is_array($data) && isset($data['html'])) {
-				$embedCode = utf8_encode($data['html']);
+				$embedCode = $data['html'];
+				//$embedCode = utf8_encode($data['html']);
 
 				$sql = 	"INSERT INTO $table SET " . 
 					"video_id=:videoID, " . 
@@ -172,11 +175,12 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 	 */
 	protected function embedYoutube(&$str) {
 
-		// perform a strpos fast check before performing regex check
+		// perform a strpos fast check before performing regex check https://www.youtube.com/watch?v=uee-tGb1KGQ
 		if(strpos($str, '://www.youtube.com/watch') === false 
 			&& strpos($str, '://www.youtube.com/v/') === false 
 			&& strpos($str, '://youtu.be/') === false) return;
 
+		wire('log')->save('embedyoutube', 'paso 1');
 		// 1: full URL | 2:video id | 3: query string (optional)
 		$regex = '#<p>\s*(https?://(?:www\.)?youtu(?:.be|be.com)+/(?:watch/?\?v=|v/)?([^\s&<\'"]+))(&[-_,.=&;a-zA-Z0-9]*)?.*?</p>#';
 		if(!preg_match_all($regex, $str, $matches)) return;
@@ -184,13 +188,14 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 		foreach($matches[0] as $key => $line) { 
 
 			$oembedURL = 
-				"$this->https://www.youtube.com/oembed?url=" . urlencode($matches[1][$key]) . 
+				"$this->http://www.youtube.com/oembed?url=" . urlencode($matches[1][$key]) . 
 				"&format=json&maxwidth={$this->maxWidth}&maxheight={$this->maxHeight}"; 
 
+			wire('log')->save('embedyoutube', 'paso 2 - '. $matches[2][$key]);
 			$videoID = $matches[2][$key]; 
 			$queryString = isset($matches[3][$key]) ? $matches[3][$key] : '';
 			$embedCode = $this->getEmbedCode($oembedURL, $videoID); 
-
+			wire('log')->save('embedyoutube', 'paso 3 - '. $embedCode);
 			if($embedCode) {
 				if(strlen($queryString)) {
 					$queryString = str_replace('&amp;', '&', $queryString);
@@ -221,7 +226,7 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 		foreach($matches[0] as $key => $line) { 
 
 			$oembedURL = 
-				"$this->https://vimeo.com/api/oembed.json?url=" . urlencode($matches[1][$key]) . 
+				"$this->http://vimeo.com/api/oembed.json?url=" . urlencode($matches[1][$key]) . 
 				"&maxwidth={$this->maxWidth}&maxheight={$this->maxHeight}"; 
 
 			$videoID = $matches[2][$key]; 
@@ -248,7 +253,7 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 		foreach($matches[0] as $key => $line) { 
 
 			$oembedURL = 
-				"$this->https://issuu.com/oembed?url=" . urlencode($matches[1][$key]) . 
+				"$this->http://issuu.com/oembed?url=" . urlencode($matches[1][$key]) . 
 				"&maxwidth={$this->maxWidth}&maxheight={$this->maxHeight}&format=json"; 
 
 			$videoID = $matches[3][$key]; 
@@ -274,7 +279,7 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 		foreach($matches[0] as $key => $line) { 
 
 			$oembedURL = 
-				"$this->https://publish.twitter.com/oembed?url=" . urlencode($matches[1][$key]) . 
+				"$this->http://publish.twitter.com/oembed?url=" . urlencode($matches[1][$key]) . 
 				"&maxwidth={$this->maxWidth}&maxheight={$this->maxHeight}&lang=es"; 
 
 			$videoID = 'tw-'.$matches[3][$key]; 
@@ -304,7 +309,7 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 			$pType = ($matches[5][$key]=='videos' ? 'video':($matches[5][$key]=='posts' ? 'post':''));
 
 			$oembedURL = 
-				"$this->https://www.facebook.com/plugins/{$pType}/oembed.json/?url=" . urlencode($matches[1][$key]) .
+				"$this->http://www.facebook.com/plugins/{$pType}/oembed.json/?url=" . urlencode($matches[1][$key]) .
 				"&maxwidth={$this->maxWidth}" ; 
 
 			$videoID = 'fb-'.$this->wire('sanitizer')->name($matches[6][$key]); 
@@ -340,7 +345,7 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 		foreach($matches[0] as $key => $line) { 
 
 			$oembedURL = 
-				"$this->https://api.instagram.com/oembed?url=" . urlencode($matches[1][$key]) . 
+				"$this->http://api.instagram.com/oembed?url=" . urlencode($matches[1][$key]) . 
 				"&maxwidth={$this->maxWidth}&maxheight={$this->maxHeight}&omitscript=false"; 
 
 			$videoID = 'ig-'.$matches[4][$key]; 
