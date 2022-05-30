@@ -160,6 +160,7 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 		$this->embedTwitter($str);
 		$this->embedFacebook($str);
 		$this->embedInstagram($str);
+		$this->embedTikTok($str)
 	}
 
 	/**
@@ -346,6 +347,28 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 			$embedCode = $this->makeCenterEmbed($embedCode);
 
 			if($embedCode) $str = str_replace($line, $embedCode, $str); 
+		}
+	}
+	
+	 /**
+	 * Check for TikTok URLS and embed when found
+	 * 
+	 * @var string $str
+	 *
+	 */
+
+	protected function embedTikTok(&$str){
+		if(strpos($str, '://www.tiktok.com') === false 
+		   && strpos($str, '://tiktok.com') === false) return;
+		if(!preg_match_all('#<p>\s*((https?:\/\/(www\.)?tiktok.com)+/(@[a-zA-z0-9]*)?\/video\/([0-9]+)?.*?(\s+)?)</p>#', $str, $matches)) return;
+
+		foreach($matches[0] as $key => $line) { 
+		    $tikTokUrl =  urlencode($matches[1][$key]);
+		    $videoID = $matches[5][$key];
+		    $oembedURL = "https://www.tiktok.com/oembed?url={$tikTokUrl}";
+		    $embedCode = $this->getEmbedCode($oembedURL, $videoID);
+		    
+		    if($embedCode) $str = str_replace($line, $embedCode, $str); 
 		}
 	}
 	
