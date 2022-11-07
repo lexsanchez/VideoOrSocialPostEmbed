@@ -160,7 +160,7 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 		$this->embedTwitter($str);
 		$this->embedFacebook($str);
 		$this->embedInstagram($str);
-		$this->embedTikTok($str)
+		$this->embedTikTok($str);
 	}
 
 	/**
