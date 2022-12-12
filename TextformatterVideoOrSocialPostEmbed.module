@@ -3,7 +3,7 @@
 /**
  * ProcessWire Video or Social Post Embedding Textformatter
  *
- * Looks for Youtube, Vimeo, Instagram, Facebook, Twitter or Issuu URLs and automatically converts them to embeds
+ * Looks for Youtube, Vimeo, Instagram, Facebook, Twitter, Tiktok or Issuu URLs and automatically converts them to embeds
  *
  * Copyright (C) 2016 by Ryan Cramer / Updated by Lex Sanchez
  * Licensed under MPL 2.0
@@ -21,8 +21,8 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 	public static function getModuleInfo() {
 		return array(
 			'title' => __('Video or Social Post Embed', __FILE__), 
-			'version' => 126, 
-			'summary' => __('Enter a full YouTube, Vimeo, Instagram, Facebook, Twitter or Issuu URL by itself in any paragraph (example: https://www.youtube.com/watch?v=Wl4XiYadV_k) and this will automatically convert it to an embedded video or social post. This formatter is intended to be run on trusted input. Recommended for use with TinyMCE textarea fields.', __FILE__),
+			'version' => 127, 
+			'summary' => __('Enter a full YouTube, Vimeo, Instagram, Facebook, Twitter, Tiktok or Issuu URL by itself in any paragraph (example: https://www.youtube.com/watch?v=Wl4XiYadV_k) and this will automatically convert it to an embedded video or social post. This formatter is intended to be run on trusted input. Recommended for use with TinyMCE textarea fields.', __FILE__),
 			'author' => 'Ryan Cramer / Lex Sanchez',
 			'href' => 'https://modules.processwire.com/modules/video-or-social-post-embed/'
 			); 
@@ -160,7 +160,7 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 		$this->embedTwitter($str);
 		$this->embedFacebook($str);
 		$this->embedInstagram($str);
-		$this->embedTikTok($str)
+		$this->embedTikTok($str);
 	}
 
 	/**
