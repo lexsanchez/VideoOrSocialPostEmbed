@@ -215,7 +215,7 @@ class TextformatterVideoOrSocialPostEmbed extends Textformatter implements Confi
 
 		if(strpos($str, '://vimeo.com/') === false) return;
 
-		if(!preg_match_all('#<p>\s*(https?://vimeo.com/(\d+)).*?</p>#', $str, $matches)) return;
+		if(!preg_match_all('#<p>\s*(https?://vimeo.com/(\d+)/?([^/]+)?).*?</p>#', $str, $matches)) return;
 
 		foreach($matches[0] as $key => $line) { 
 
